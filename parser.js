@@ -35,24 +35,8 @@ program: statement { ";" statement }
 
 */ 
 
-var executor = require('./executor.js');
 let Lexer = require('./lexer.js'); 
 
-const formula =
-
-`
-global_var = 1;
-func recurse (b) {
-    if (b - 1) {
-        b * recurse(b - 1)
-    } else {
-        1
-    }
-};
-
-recurse(3);
-recurse(10)
-`
 
 class Parser {
 
