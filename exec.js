@@ -4,6 +4,7 @@
  * @description: syntax tree executor 
  */
 
+let Const = require('./const.js'); 
 
 class Executor {
 
@@ -16,7 +17,7 @@ class Executor {
     eval(obj, amap, vmap) {
         if (typeof(obj) == 'object') {
             if (obj.oper == "+") {            
-                var result = this.eval(obj.left, amap, vmap) + this.eval(obj.right, amap, vmap);
+                var result = this.eval(obj.left, amap, vmap) + this.eval(obj.right, amap, vmap); // 支持字符串的操作
                 return result
             }
     
@@ -142,18 +143,22 @@ class Executor {
         }
     
         if (typeof(obj) == 'string') { // 立即数
-    
+
             if (/[0-9]+/.exec(obj) != null) {
                 return parseInt(obj)
             }
-    
+
+            if (Const.STRING_PATTEN().exec(obj) != null) { // 数据是字符串
+                return obj.substr(1, obj.length - 2)
+            }
+            
             if (/[a-zA-Z_]+/.exec(obj) != null) { // 变量
     
-                if ( amap[obj] != undefined) { // 参数
+                if (amap != undefined && amap[obj] != undefined) { // 参数
                     return amap[obj]
                 }
     
-                if (vmap[obj] != undefined) { // 局部变量
+                if (vmap != undefined && vmap[obj] != undefined) { // 局部变量
                     return vmap[obj]
                 }
     

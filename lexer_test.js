@@ -22,3 +22,8 @@ console.log(lexer.lookup())
 console.log(lexer.lookup(1))
 console.log(lexer.lookup(2))
 console.log(lexer.pick())
+
+n = 0
+while( (token = lexer.lookup(n++)) != "EOF" && token != undefined) {
+    console.log(token)
+}

@@ -36,7 +36,7 @@ program: statement { ";" statement }
 */ 
 
 let Lexer = require('./lexer.js'); 
-
+let Const = require('./const.js'); 
 
 class Parser {
 
@@ -62,6 +62,10 @@ class Parser {
         while (this.lexer.lookup() == ";") {
             this.lexer.pick()
             var statement = this.parse_statement()
+            if (statement == undefined) {
+                break
+            }
+
             if (statement.oper == "def") {
                 this.func_map[statement.func] = statement
             } else {
@@ -274,7 +278,13 @@ class Parser {
             return expr
         }
 
-        if (/[0-9]+/.exec(token) != null) {
+        
+        if (Const.STRING_PATTEN().exec(token) != null) { // 字符串
+            var token = this.lexer.pick()
+            return token
+        }
+
+        if (/[0-9]+/.exec(token) != null) {  // 整数
             var token = this.lexer.pick()
             return token
         }

@@ -7,6 +7,7 @@ var Parser = require('./parser.js')
 
 const formula =
 
+/*
 `
 global_var = 1;
 func recurse (b) {
@@ -20,6 +21,15 @@ func recurse (b) {
 recurse(3);
 recurse(10)
 `
+*/
+
+
+`
+prefix = "hello";
+name = "world";
+prefix + " " + name;
+`
+
 
 let parser = new Parser(formula)
 
