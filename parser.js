@@ -20,6 +20,7 @@ term: factor { ("*" | "/") factor }
 factor: NUMBER 
         | "(" expr ")"
         | NAME 
+        | NMAE "[" STRING "]"  // 字典取数
         | FUNCNAME "(" alist ")"
         | STRING   // TODO，加上 "-" NUMBER
         | "{" {STRING ":" expr ","} "}"    // 字典
@@ -307,6 +308,7 @@ class Parser {
         factor: NUMBER 
         | "(" expr ")"
         | NAME 
+        | NMAE "[" STRING "]"  // 字典取数
         | FUNCNAME "(" alist ")"
         | STRING   // TODO，加上 "-" NUMBER
         | "{" {STRING ":" expr ","} STRING ":" expr "}"    // 字典    
@@ -334,7 +336,7 @@ class Parser {
                     }
                 }
 
-                if (Const.KEY_NAME_PATTEN().test(key) == null) {
+                if (Const.NAME_PATTEN().test(key) == null) {
                     console.log("syntax error!")
                     break
                 }
@@ -370,33 +372,57 @@ class Parser {
             return token
         }
 
-        if (/[0-9]+(\.[0-9]+)?[fl]?/.exec(token) != null) {  // 整数， 浮点
+        if (Const.NUM_PATTEN().exec(token) != null) {  // 整数， 浮点
             var token = this.lexer.pick()
             return token
         }
 
-        if (/[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(token) != null) { // 变量
+        if (Const.NAME_PATTEN().exec(token) != null) { // 变量
             
-            if (this.lexer.lookups(2) == "(") { // 函数调用
-                var func_name = this.lexer.pick()
-                this.lexer.pick() // 去掉左括号
-                var alist = this.parse_alist()
-                this.lexer.pick() // 去掉右括号
-                return {
-                    "oper": "call",
-                    "func": func_name,
-                    "alist": alist
-                }
+            if (this.lexer.lookups(2) == "[") { 
+                var container = this.lexer.pick()
+                this.lexer.pick() // 去掉 [
+                var next = this.lexer.lookup()
+                if (Const.STRING_PATTEN().exec(next) != null) { // 字典
+                    var key = this.lexer.pick()
+                    this.lexer.pick()
+                    return {
+                        "oper": "mget",
+                        "map" : container,
+                        "key" : key
+                    }
+                } else { // TODO 数组下标
+                    var key = this.lexer.pick()
+                    this.lexer.pick()
+                    return {
+                        "oper": "aget",
+                        "arr" : container,
+                        "index" : key
+                    }
+                } 
 
-            } else {
-                var letter = this.lexer.pick() // 字符串（变量）
-                
-                if (this.lexer.lookup() == "=") {
-                    var token = this.lexer.pick() // 获取等号
-                    var expr = this.parse_expr()
-                    return expr
+            } else { // 变量
+                if (this.lexer.lookups(2) == "(") { // 函数调用
+                    var func_name = this.lexer.pick()
+                    this.lexer.pick() // 去掉左括号
+                    var alist = this.parse_alist()
+                    this.lexer.pick() // 去掉右括号
+                    return {
+                        "oper": "call",
+                        "func": func_name,
+                        "alist": alist
+                    }
+
                 } else {
-                    return letter 
+                    var letter = this.lexer.pick() // 字符串（变量）
+                    
+                    if (this.lexer.lookup() == "=") {
+                        var token = this.lexer.pick() // 获取等号
+                        var expr = this.parse_expr()
+                        return expr
+                    } else {
+                        return letter 
+                    }
                 }
             }
         }

@@ -173,6 +173,12 @@ class Executor {
                 return obj.data
             }
             
+            if (obj.oper == "mget") { // map 取值 TODO， 1)map设置值; 2) 判断map是否为局部变量
+                var map_name = obj.map
+                var map = this.const_map[map_name]
+                var key = obj.key
+                return this.eval(map[key], amap, vmap)
+            }
     
         }
     
