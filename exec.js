@@ -167,6 +167,12 @@ class Executor {
                 statements[statements.length - 1].vmap = vmap // 局部变量表
                 return this.eval(statements[statements.length - 1], amap, vmap)
             }
+            
+            
+            if (obj.oper == "map") { // 数据类型 为 表
+                return obj.data
+            }
+            
     
         }
     

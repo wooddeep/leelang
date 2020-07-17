@@ -17,8 +17,13 @@ term: factor { ("*" | "/") factor }
      | factor "<=" factor
      | factor "==" factor
 
+factor: NUMBER 
+        | "(" expr ")"
+        | NAME 
+        | FUNCNAME "(" alist ")"
+        | STRING   // TODO，加上 "-" NUMBER
+        | "{" {STRING ":" expr ","} "}"    // 字典
 
-factor: NUMBER | "(" expr ")" | NAME | FUNCNAME "(" alist ")" | STRING   // TODO，加上 "-" NUMBER
 
 sentence: statement {; statement} 
 
@@ -297,6 +302,15 @@ class Parser {
     /*
      * factor: NUMBER | "(" expression ")" | NAME | FUNCNAME "(" alist ")"
      */
+
+    /*
+        factor: NUMBER 
+        | "(" expr ")"
+        | NAME 
+        | FUNCNAME "(" alist ")"
+        | STRING   // TODO，加上 "-" NUMBER
+        | "{" {STRING ":" expr ","} STRING ":" expr "}"    // 字典    
+    */
      parse_factor() {
         var token = this.lexer.lookup()
 
@@ -308,6 +322,49 @@ class Parser {
         }
 
         
+        if (token == "{") { // 对象
+            this.lexer.pick() // 去掉 "{"
+            var out = {}
+            while(true) {
+                var key = this.lexer.pick()
+                if (key == "}") {
+                    return {
+                        "oper": "map",
+                        "data": out 
+                    }
+                }
+
+                if (Const.KEY_NAME_PATTEN().test(key) == null) {
+                    console.log("syntax error!")
+                    break
+                }
+                
+                var colon = this.lexer.pick()
+                if (colon != ":") {
+                    console.log("syntax error!")
+                    break
+                }
+
+                var value = this.parse_expr()
+                out[key] = value
+
+                var tail = this.lexer.lookup()
+                if (tail == ",") {
+                    this.lexer.pick()
+                } else if (tail == "}") { // 正常结束
+                    this.lexer.pick()
+                    return {
+                        "oper": "map",
+                        "data": out
+                    }
+                } else {
+                    console.log("syntax error!")
+                    break;
+                }
+            }
+        }
+        
+
         if (Const.STRING_PATTEN().exec(token) != null) { // 字符串
             var token = this.lexer.pick()
             return token

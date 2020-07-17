@@ -25,6 +25,7 @@ recurse(10)
 
 
 `
+1 + 1;
 2 != 1;
 2.1f + 3.2f;
 prefix = "hello";
@@ -34,6 +35,7 @@ prefix + " " + name;
 if (2 != 1) {
     2
 }
+map = {"k1": 1 + 1, "k2": "lee"}
 
 `
 
