@@ -176,8 +176,25 @@ class Executor {
             if (obj.oper == "mget") { // map 取值 TODO， 1)map设置值; 2) 判断map是否为局部变量
                 var map_name = obj.map
                 var map = this.const_map[map_name]
+                for (key in map) {
+                    console.log(key, "->", map[key])
+                }
+
                 var key = obj.key
+                if (key == "k3") {
+                    console.log("target key:", key)
+                }
+
                 return this.eval(map[key], amap, vmap)
+            }
+
+            if (obj.oper == "set") { // map 或者 array 设置
+                var map_name = obj.map
+                var map = this.const_map[map_name]
+                var key = obj.key
+                var value = this.eval(obj.value, amap, vmap)
+                map[key] = value
+                return value
             }
     
         }
@@ -192,8 +209,9 @@ class Executor {
                 }
             }
 
-            if (Const.STRING_PATTEN().exec(obj) != null) { // 数据是字符串
-                return obj.substr(1, obj.length - 2)
+            if (Const.STRING_PATTEN().exec(obj) != null) { // 数据是字符串 // TODO
+                //return obj.substr(1, obj.length - 2)
+                return obj
             }
             
             if (/[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(obj) != null) { // 变量

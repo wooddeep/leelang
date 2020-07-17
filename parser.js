@@ -8,6 +8,7 @@
 
 expr: term { ("+" | "-") term } 
      | NAME "=" expr
+     | NAME "[" expr "]" "=" expr
      | local NAME "=" expr
 
 term: factor { ("*" | "/") factor } 
@@ -218,6 +219,7 @@ class Parser {
      * expr: term { ("+" | "-") term } 
      *   | NAME "=" expr
      *   | local NAME "=" expr
+     *   | NAME "[" expr "]" "=" expr  // 字典赋值
      */
     parse_expr() {
 
@@ -232,7 +234,7 @@ class Parser {
                 "value": expr,
                 "local":true
             }
-        }
+        }        
 
         if (this.lexer.lookups(2) == "=") { // 赋值
             var letter = this.lexer.pick() // 字符串（变量）
@@ -243,6 +245,20 @@ class Parser {
                 "name": letter,
                 "value": expr
             }
+        } else if (this.lexer.lookups(2) == "[" && this.lexer.lookups(5) == "=") { // 字典，或者数组赋值
+            var container = this.lexer.pick()
+            this.lexer.pick() // 去掉 [
+            var key = this.parse_expr()
+            this.lexer.pick() // 去掉 ]
+            this.lexer.pick() // 去掉 =
+            var value = this.parse_expr()
+            return {
+                "oper": "set",
+                "key" : key,
+                "map" : container,
+                "value": value
+            }
+
         } else {
             var left =  this.parse_term()
             while ( this.lexer.lookup() == "+" ||  this.lexer.lookup() == "-") { // 递归
