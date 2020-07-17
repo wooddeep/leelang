@@ -25,10 +25,16 @@ recurse(10)
 
 
 `
+2 != 1;
 2.1f + 3.2f;
 prefix = "hello";
 name = "world";
 prefix + " " + name;
+
+if (2 != 1) {
+    2
+}
+
 `
 
 

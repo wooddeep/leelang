@@ -36,6 +36,34 @@ class Executor {
                 return result
             }
     
+            if (obj.oper == "cmp") { // 比较运算符
+                var token = obj.token
+                if (token == ">") {
+                    var result = this.eval(obj.left, amap, vmap) > this.eval(obj.right, amap, vmap);
+                    return result
+                }
+                if (token == ">=") {
+                    var result = this.eval(obj.left, amap, vmap) >= this.eval(obj.right, amap, vmap);
+                    return result
+                }
+                if (token == "<") {
+                    var result = this.eval(obj.left, amap, vmap) < this.eval(obj.right, amap, vmap);
+                    return result
+                }
+                if (token == "<=") {
+                    var result = this.eval(obj.left, amap, vmap) <= this.eval(obj.right, amap, vmap);
+                    return result
+                }
+                if (token == "==") {
+                    var result = this.eval(obj.left, amap, vmap) == this.eval(obj.right, amap, vmap);
+                    return result
+                }
+                if (token == "!=") {
+                    var result = this.eval(obj.left, amap, vmap) != this.eval(obj.right, amap, vmap);
+                    return result
+                }
+            }
+
             if (obj.oper == "assign") { // 变量赋值， 全局变量，参数，局部变量
     
                 if (amap == undefined) { // 必然为全局赋值
@@ -142,7 +170,7 @@ class Executor {
     
         }
     
-        if (typeof(obj) == 'string') { // 立即数
+        if (typeof(obj) == 'string') { // 立即数 或者 变量
 
             if (/[0-9]+(\.[0-9]+)?[fl]?/.exec(obj) != null) { // 整形数，浮点数
                 if (obj.indexOf(".") < 0) {

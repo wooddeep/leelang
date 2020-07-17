@@ -10,9 +10,15 @@ expr: term { ("+" | "-") term }
      | NAME "=" expr
      | local NAME "=" expr
 
-term: factor { ("*" | "/") factor }
+term: factor { ("*" | "/") factor } 
+     | factor ">" factor
+     | factor ">=" factor
+     | factor "<" factor
+     | factor "<=" factor
+     | factor "==" factor
 
-factor: NUMBER | "(" expr ")" | NAME | FUNCNAME "(" alist ")" | STRING 
+
+factor: NUMBER | "(" expr ")" | NAME | FUNCNAME "(" alist ")" | STRING   // TODO，加上 "-" NUMBER
 
 sentence: statement {; statement} 
 
@@ -249,8 +255,31 @@ class Parser {
     /*
      * term: factor { ("*" | "/") factor }
      */
+
+    /*
+    term: factor { ("*" | "/") factor } 
+     | factor ">" factor
+     | factor ">=" factor
+     | factor "<" factor
+     | factor "<=" factor
+     | factor "==" factor
+    */
     parse_term() {
         var left =  this.parse_factor()
+
+        var next = this.lexer.lookup()
+
+        if (/(>)|(>=)|(<)|(<=)|(==)|(!=)/.exec(next) != null) {
+            var token = this.lexer.pick()
+            var right = this.parse_factor()
+            var out = {
+                "oper": "cmp", // 比较
+                "token": token,
+                "left": left,
+                "right": right
+            }
+            return out
+        }
 
         while ( this.lexer.lookup() == "*" ||  this.lexer.lookup() == "/") {
             var oper =  this.lexer.pick()
