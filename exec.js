@@ -144,15 +144,19 @@ class Executor {
     
         if (typeof(obj) == 'string') { // 立即数
 
-            if (/[0-9]+/.exec(obj) != null) {
-                return parseInt(obj)
+            if (/[0-9]+(\.[0-9]+)?[fl]?/.exec(obj) != null) { // 整形数，浮点数
+                if (obj.indexOf(".") < 0) {
+                    return parseInt(obj)
+                } else {
+                    return parseFloat(obj)
+                }
             }
 
             if (Const.STRING_PATTEN().exec(obj) != null) { // 数据是字符串
                 return obj.substr(1, obj.length - 2)
             }
             
-            if (/[a-zA-Z_]+/.exec(obj) != null) { // 变量
+            if (/[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(obj) != null) { // 变量
     
                 if (amap != undefined && amap[obj] != undefined) { // 参数
                     return amap[obj]

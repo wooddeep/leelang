@@ -284,12 +284,12 @@ class Parser {
             return token
         }
 
-        if (/[0-9]+/.exec(token) != null) {  // 整数
+        if (/[0-9]+(\.[0-9]+)?[fl]?/.exec(token) != null) {  // 整数， 浮点
             var token = this.lexer.pick()
             return token
         }
 
-        if (/[a-zA-Z]+/.exec(token) != null) { // 变量
+        if (/[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(token) != null) { // 变量
             
             if (this.lexer.lookups(2) == "(") { // 函数调用
                 var func_name = this.lexer.pick()

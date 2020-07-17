@@ -5,7 +5,7 @@
 class Lexer {
     
     constructor (formula) {
-        this.token_patt = /([a-zA-Z][\-_a-zA-Z0-9]*|".*"|\-?[0-9]+(.[0-9]+)?[fl]?|[;+\-*/=\(\)\{\}]|>=|<=|==|!=|>>|<<|&&|\|\|)/gm
+        this.token_patt = /([_a-zA-Z][\-_a-zA-Z0-9]*|".*"|\-?[0-9]+(.[0-9]+)?[fl]?|[;+\-*/=\(\)\{\}]|>=|<=|==|!=|>>|<<|&&|\|\|)/gm
         this.curr_index = 0
         this.token_list = []
         this.formula = formula

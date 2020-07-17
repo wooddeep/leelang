@@ -25,6 +25,7 @@ recurse(10)
 
 
 `
+2.1f + 3.2f;
 prefix = "hello";
 name = "world";
 prefix + " " + name;
