@@ -16,6 +16,12 @@ class Executor {
 
     eval(obj, amap, vmap) {
         if (typeof(obj) == 'object') {
+
+            if (obj.t == "str") { // 字符串对象
+                //return obj.v.substr(1, obj.v.length - 2)
+                return obj.v
+            }
+
             if (obj.oper == "+") {            
                 var result = this.eval(obj.left, amap, vmap) + this.eval(obj.right, amap, vmap); // 支持字符串的操作
                 return result
@@ -176,22 +182,20 @@ class Executor {
             if (obj.oper == "mget") { // map 取值 TODO， 1)map设置值; 2) 判断map是否为局部变量
                 var map_name = obj.map
                 var map = this.const_map[map_name]
-                for (key in map) {
-                    console.log(key, "->", map[key])
-                }
+                var key = this.eval(obj.key, amap, vmap) 
+                
+                console.log("## get key -> ", key)
 
-                var key = obj.key
-                if (key == "k3") {
-                    console.log("target key:", key)
-                }
-
+                console.log("## fuck:", map[key])
+                
                 return this.eval(map[key], amap, vmap)
             }
 
             if (obj.oper == "set") { // map 或者 array 设置
                 var map_name = obj.map
                 var map = this.const_map[map_name]
-                var key = obj.key
+                var key = this.eval(obj.key, amap, vmap)
+                console.log("## set key -> ", key)
                 var value = this.eval(obj.value, amap, vmap)
                 map[key] = value
                 return value
@@ -200,8 +204,7 @@ class Executor {
         }
     
         if (typeof(obj) == 'string') { // 立即数 或者 变量
-
-            if (/[0-9]+(\.[0-9]+)?[fl]?/.exec(obj) != null) { // 整形数，浮点数
+            if (/^[0-9]+(\.[0-9]+)?[fl]?/.exec(obj) != null) { // 整形数，浮点数
                 if (obj.indexOf(".") < 0) {
                     return parseInt(obj)
                 } else {
@@ -214,7 +217,7 @@ class Executor {
                 return obj
             }
             
-            if (/[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(obj) != null) { // 变量
+            if (/^[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(obj) != null) { // 变量
     
                 if (amap != undefined && amap[obj] != undefined) { // 参数
                     return amap[obj]

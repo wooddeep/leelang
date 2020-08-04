@@ -18,12 +18,12 @@ term: factor { ("*" | "/") factor }
      | factor "<=" factor
      | factor "==" factor
 
-factor: NUMBER 
+factor: NUMBER // TODO，加上 "-" NUMBER
         | "(" expr ")"
         | NAME 
         | NMAE "[" STRING "]"  // 字典取数
         | FUNCNAME "(" alist ")"
-        | STRING   // TODO，加上 "-" NUMBER
+        | STRING   
         | "{" {STRING ":" expr ","} "}"    // 字典
 
 
@@ -321,18 +321,18 @@ class Parser {
      */
 
     /*
-        factor: NUMBER 
+        factor: NUMBER  // TODO，加上 "-" NUMBER  
         | "(" expr ")"
         | NAME 
         | NMAE "[" STRING "]"  // 字典取数
         | FUNCNAME "(" alist ")"
-        | STRING   // TODO，加上 "-" NUMBER
+        | STRING   
         | "{" {STRING ":" expr ","} STRING ":" expr "}"    // 字典    
     */
      parse_factor() {
         var token = this.lexer.lookup()
 
-        if (token == "(") {
+        if (token == "(") { // 括号表达式
             this.lexer.pick()
             var expr = this.parse_expr()
             this.lexer.pick()
@@ -364,7 +364,7 @@ class Parser {
                 }
 
                 var value = this.parse_expr()
-                out[key] = value
+                out[key.substr(1, key.length - 2)] = value // 去除 键值 两边的 "
 
                 var tail = this.lexer.lookup()
                 if (tail == ",") {
@@ -385,7 +385,13 @@ class Parser {
 
         if (Const.STRING_PATTEN().exec(token) != null) { // 字符串
             var token = this.lexer.pick()
-            return token
+
+            //console.log("#token --> ", token)
+
+            return {
+                "t": "str",
+                "v": token //.substr(1, token.length - 2) // 侦测到字符串， 去掉首尾的双引号
+            }
         }
 
         if (Const.NUM_PATTEN().exec(token) != null) {  // 整数， 浮点
@@ -400,7 +406,7 @@ class Parser {
                 this.lexer.pick() // 去掉 [
                 var next = this.lexer.lookup()
                 if (Const.STRING_PATTEN().exec(next) != null) { // 字典
-                    var key = this.lexer.pick()
+                    var key = this.parse_expr()
                     this.lexer.pick()
                     return {
                         "oper": "mget",
@@ -408,7 +414,7 @@ class Parser {
                         "key" : key
                     }
                 } else { // TODO 数组下标
-                    var key = this.lexer.pick()
+                    var key = this.parse_expr()
                     this.lexer.pick()
                     return {
                         "oper": "aget",
