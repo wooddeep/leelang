@@ -5,44 +5,19 @@
 var Executor = require('./exec.js')
 var Parser = require('./parser.js')
 
-const formula =
+const fs = require('fs');
 
-/*
-`
-global_var = 1;
-func recurse (b) {
-    if (b - 1) {
-        b * recurse(b - 1)
-    } else {
-        1
-    }
-};
+var lee_script = process.argv.splice(2)[0]; // 脚本文件全路径
 
-recurse(3);
-recurse(10);
-`
-*/
+formula = ";"
 
-`
-user = {"name": "lee", "age": 37};
-user["name"] = "hello";
-user["name"] = "hello" + "WORLD";
-user["name"];
-`
+try {
+    formula = fs.readFileSync(lee_script, 'utf-8');
+} catch(e) {
+    console.log('read file <' + lee_script + "> error!", e);
+    process.exit(1)
+}
 
-
-/*
-map = {"k1": 1 + 1, "k2": "hello world"};
-map["k3"] = map["k2"] + " " + "lihan";
-map["k3"];
-*/
-
-/*
-map = {"k1": 1 + 1, "k2": "hello world"};
-map["k3"] = map["k2"] + " " + "lihan";
-map;
-map["k3"];
-*/
 
 let parser = new Parser(formula)
 

@@ -1,0 +1,5 @@
+user = {"name": "lee", "age": 37};
+user["name"] = "hello";
+user["name"] = "hello" + " WORLD";
+user["name"];
+user["age"];
