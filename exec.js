@@ -17,12 +17,24 @@ class Executor {
     eval(obj, amap, vmap) {
         if (typeof(obj) == 'object') {
 
-            if (obj.t == "str") { // 字符串对象
-                //return obj.v.substr(1, obj.v.length - 2)
-                return obj.v
+            if (obj.t == "str") { // 字符串对象, 区分 键 或者 值!
+
+                if (obj['string'] == true) {
+                    return obj.v.substr(1, obj.v.length - 2) // 作为map键值的字符串
+                } else {
+                    return obj // 作为 字符串变量的字符串
+                }
             }
 
-            if (obj.oper == "+") {            
+            if (obj.oper == "+") {     
+                var left = this.eval(obj.left, amap, vmap) 
+                var right = this.eval(obj.right, amap, vmap)
+
+                if (typeof(left) == 'object') {
+                    var svalue = left.v.substr(1, left.v.length - 2) + right.v.substr(1, right.v.length - 2)
+                    return {"t": "str", "v": '"' + svalue + '"'} // 还原两边的引号('"')
+                }
+                
                 var result = this.eval(obj.left, amap, vmap) + this.eval(obj.right, amap, vmap); // 支持字符串的操作
                 return result
             }
@@ -182,21 +194,23 @@ class Executor {
             if (obj.oper == "mget") { // map 取值 TODO， 1)map设置值; 2) 判断map是否为局部变量
                 var map_name = obj.map
                 var map = this.const_map[map_name]
-                var key = this.eval(obj.key, amap, vmap) 
-                
-                console.log("## get key -> ", key)
-
-                console.log("## fuck:", map[key])
+                obj.key['string'] = true // 标识这是一个字符串基础类型
+                var key = this.eval(obj.key, amap, vmap) // TODO 区分 键字符串 和 值 字符串， 这里通过 'string' 来标识，很恶心！得修改！
                 
                 return this.eval(map[key], amap, vmap)
             }
 
-            if (obj.oper == "set") { // map 或者 array 设置
+            if (obj.oper == "mset") { // map 或者 array 设置
                 var map_name = obj.map
                 var map = this.const_map[map_name]
+                obj.key['string'] = true // 标识这是一个字符串基础类型
                 var key = this.eval(obj.key, amap, vmap)
-                console.log("## set key -> ", key)
+
                 var value = this.eval(obj.value, amap, vmap)
+
+                console.log("## set key : ", key, " -> value : ", value)
+
+
                 map[key] = value
                 return value
             }
@@ -213,8 +227,8 @@ class Executor {
             }
 
             if (Const.STRING_PATTEN().exec(obj) != null) { // 数据是字符串 // TODO
-                //return obj.substr(1, obj.length - 2)
-                return obj
+                return obj.substr(1, obj.length - 2)
+                //return obj
             }
             
             if (/^[_a-zA-Z][\-_a-zA-Z0-9]*/.exec(obj) != null) { // 变量

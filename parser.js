@@ -253,7 +253,7 @@ class Parser {
             this.lexer.pick() // 去掉 =
             var value = this.parse_expr()
             return {
-                "oper": "set",
+                "oper": "mset",
                 "key" : key,
                 "map" : container,
                 "value": value
