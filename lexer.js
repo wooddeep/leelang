@@ -6,7 +6,7 @@ class Lexer {
     
     // /".*?"/ 正则匹配去贪婪模式
     constructor (formula) {
-        this.token_patt = /[_a-zA-Z][\-_a-zA-Z0-9]*|".*?"|\-?[0-9]+\.?[0-9]*[lf]*|[,:;\+\-\*/=\(\)\{\}\[\]]|>|<|>=|<=|==|!=|>>|<<|&&|\|\|/gm
+        this.token_patt = /#[^\n]*\n|[_a-zA-Z][\-_a-zA-Z0-9]*|".*?"|\-?[0-9]+\.?[0-9]*[lf]*|[,:;\+\-\*/=\(\)\{\}\[\]]|>|<|>=|<=|==|!=|>>|<<|&&|\|\|/gm
         //this.token_patt = /([_a-zA-Z][\-_a-zA-Z0-9]*|".*?"|\-?[0-9]+(.[0-9]+)?[fl]?|[,:;+\-*/=\(\)\{\}]|>|<|>=|<=|==|!=|>>|<<|&&|\|\|)/gm
         this.curr_index = 0
         this.token_list = []
@@ -27,7 +27,7 @@ class Lexer {
         this.token_list = []
         do {
             var r = this.token_patt.exec(input)
-            if (r != null) {
+            if (r != null && r[0][0] != '#') {
                 this.token_list.push(r[0])
             }
         } while (r != null)

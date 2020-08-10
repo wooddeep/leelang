@@ -18,7 +18,6 @@ try {
     process.exit(1)
 }
 
-
 let parser = new Parser(formula)
 
 var out = parser.parse_program() // 解析出 语法树 列表

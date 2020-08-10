@@ -1,3 +1,23 @@
+# x = 1;
+
+
+#global_var = 1;
+#func recurse (b) {
+#    if (b - 1) {
+#        b * recurse(b - 1)
+#    } else {
+#        1
+#    }
+#};
+
+#recurse(3);
+#recurse(10);
+
+#map = {"k1": 1 + 1, "k2": "hello world"};
+#map["k3"] = map["k2"] + " " + "lihan";
+#map;
+#map["k3"];
+
 user = {"name": "lee", "age": 37};
 user["name"] = "hello";
 user["name"] = "hello" + " WORLD";
